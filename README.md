@@ -28,7 +28,7 @@ It parses XML-based driving scenarios and generates executable Scenic scripts in
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/xosc-to-scenic.git
+git clone https://github.com/your-username/xosc-to-scenic.gi
 cd xosc-to-scenic
 ```
 
@@ -36,33 +36,15 @@ cd xosc-to-scenic
 
 ## Usage
 
-### Basic usage:
-
-```bash
-python xosc_to_scenic.py input.xosc
-```
 
 ### Custom output:
 
 ```bash
-python xosc_to_scenic.py input.xosc output.scenic
+python conv.py input.xosc output.scenic
 ```
 
 ---
 
-## Example
-
-Input:
-
-```
-scenario.xosc
-```
-
-Output:
-
-```
-scenario.scenic
-```
 
 ---
 
