@@ -28,7 +28,7 @@ It parses XML-based driving scenarios and generates executable Scenic scripts in
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/xosc-to-scenic.gi
+git clone https://github.com/your-username/xosc-to-scenic.git
 cd xosc-to-scenic
 ```
 
