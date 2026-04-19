@@ -31,7 +31,7 @@ It parses XML-based driving scenarios and generates executable Scenic scripts in
 
 
 ```bash
-Download conv.py file 
+#Download conv.py file 
 python conv.py input.xosc output.scenic
 #Make sure your xosc file and conv.py file are in the same place, or enter the full path of the file, and the same for the output file.
 ```
