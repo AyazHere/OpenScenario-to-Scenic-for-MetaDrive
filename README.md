@@ -25,22 +25,15 @@ It parses XML-based driving scenarios and generates executable Scenic scripts in
 
 ---
 
-## Installation
+
+
+## How to Use
+
 
 ```bash
-git clone https://github.com/your-username/xosc-to-scenic.git
-cd xosc-to-scenic
-```
-
----
-
-## Usage
-
-
-### Custom output:
-
-```bash
+Download conv.py file 
 python conv.py input.xosc output.scenic
+#Make sure your xosc file and conv.py file are in the same place, or enter the full path of the file, and the same for the output file.
 ```
 
 ---
@@ -79,6 +72,4 @@ Ayaz Ahmed
 
 ---
 
-## License
 
-MIT License
