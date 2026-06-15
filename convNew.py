@@ -488,22 +488,47 @@ class ScenicWriter:
         has_behavior = bool(e.waypoints or e.speed_profile)
 
         # Build the specifier list — order matters in Scenic 3.
-        # Hybrid placement:
-        #   1. start near the original OpenSCENARIO x/y position,
-        #   2. restrict the spawn area to Scenic's valid lane region,
-        #   3. align the vehicle with the lane direction.
-        # We use a small region intersection instead of "at ..., on network.laneRegion"
-        # because PolygonalRegion projection is not supported by all Scenic versions.
+        #
+        # HYBRID PLACEMENT v4 (coordinate + lane region, Scenic-native):
+        #   'at (x, y), on network.laneRegion'
+        #     - 'at (x, y)' establishes the original xosc position, so the
+        #       scenario geometry is preserved.
+        #     - 'on network.laneRegion' is a MODIFYING specifier: because the
+        #       position is already given by 'at', Scenic PROJECTS that point
+        #       onto the nearest point of laneRegion (the union of all lanes,
+        #       which EXCLUDES intersections). This snaps the car onto a lane
+        #       with no shapely helper — Scenic does the projection internally.
+        #     - Result: car sits on a real lane near its original spot, so
+        #       FollowLaneBehavior can find its lane (no step-0 crash) and the
+        #       heading default resolves to the lane (not a broken junction).
+        #
+        # NOTE: heading is left to Scenic's default (roadDirection at the
+        # projected point). On a clean map this aligns to the lane. If a map
+        # still has broken junctions, run fix_xodr.py on the .xodr first.
+        #
+        # Fallback (no spawn position in xosc): random lane via
+        # Uniform(*network.lanes). network.lanes is a Python LIST, so it
+        # cannot be used directly with 'on' — Uniform(*...) picks one lane.
         if spawn:
-            spawn_region = f"{safe_name(e.name)}_SpawnRegion"
-            self._w(f"{spawn_region} = CircularRegion({pos_str}, radius=5).intersect(network.laneRegion)")
-            specs = [f"on {spawn_region}", "with roadDeviation 0 deg"]
+            specs = [
+                f"at {pos_str}",
+                "on network.laneRegion",
+            ]
         else:
-            specs = ["on network.laneRegion", "with roadDeviation 0 deg"]
+            specs = ["on Uniform(*network.lanes)", "with roadDeviation 0 deg"]
+
         if e.init_speed > 0:
             specs.append(f"with speed {e.init_speed:.4f}")
+
+        # Behavior: every MOVING vehicle must steer, otherwise it travels in
+        # a straight line and leaves the road at the first curve.
+        #   - entities with xosc actions get their custom behavior
+        #   - any other vehicle with speed > 0 gets FollowLaneBehavior so it
+        #     follows the lane geometry instead of driving off the road
         if has_behavior:
             specs.append(f"with behavior {safe_name(e.name)}_Behavior()")
+        elif e.init_speed > 0 and e.scenic_class != "Pedestrian":
+            specs.append(f"with behavior FollowLaneBehavior({e.init_speed:.4f})")
 
         # Comments go ABOVE the declaration, never inside it
         comments = []
